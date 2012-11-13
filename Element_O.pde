@@ -12,7 +12,7 @@ GL gl;
 
 // element properties
 Element[] elements;
-int elementCount = 5000;
+int elementCount = 10000;
 float zBoundary = 500;
 
 // disc properties
@@ -43,7 +43,7 @@ void setup() {
     float y = discRadius * sin(theta) + random(-elementPosVariance, elementPosVariance);
     float z = 0;
     
-    elements[i] = new Element(x, y, z);
+    elements[i] = new Element(x, y, z, theta);
   }
   
   background(0);
@@ -101,6 +101,6 @@ void resetElements() {
     float y = discRadius * sin(theta) + random(-elementPosVariance, elementPosVariance);
     float z = 0;
     
-    elements[i] = new Element(x, y, z);
+    elements[i] = new Element(x, y, z, theta);
   }
 }

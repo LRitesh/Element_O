@@ -1,22 +1,27 @@
 class Element {
   
+  PVector ePosInit;
   PVector ePos;
-  PVector eVel;
   int eSize;
   color eColor;
   
-  Element(float x, float y, float z){
-    ePos = new PVector(x, y, z);
-    eVel = new PVector(0, 0, 0);
+  float eTheta;
+  float eVel;
+  
+  Element(float x, float y, float z, float theta){
+    ePosInit = new PVector(x, y, z);
+    ePos = new PVector(0, 0, 0);
     eSize = (int)random(2, 5);
     eColor = color(cp.colors[(int)random(cp.colors.length)]);
+    
+    eTheta = theta;
+    eVel = random(PI/100.0);
   }
   
   void update() {
-//    eVel.x =  random(-1, 1);
-//    eVel.y = random(-1, 1);
-//    eVel.z = random(-1, 1);
-//    ePos.add(eVel);
+    ePos.x = ePosInit.x + discRadius * cos(eTheta);
+    ePos.y = ePosInit.y + discRadius * sin(eTheta);
+    ePos.z = ePosInit.z;
     
     if(ePos.x > width/2)
       ePos.x = -width/2;
@@ -32,6 +37,8 @@ class Element {
       ePos.z = -zBoundary;
     else if(ePos.z < -zBoundary)
       ePos.z = zBoundary;
+      
+    eTheta += eVel;
   }
   
   void paint () {
