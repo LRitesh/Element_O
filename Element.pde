@@ -27,10 +27,10 @@ class Element {
   }
   
   void update() {
-    ePos.x = ePosInit.x + discRadius * cos(eTheta) * sin(ePhi) + eXVariance; // 
-    ePos.y = ePosInit.y + discRadius * sin(eTheta) * sin(ePhi) + eYVariance;
-    ePos.z = ePosInit.z + discRadius * cos(ePhi);
-//    ePos = ePosInit;
+//    ePos.x = ePosInit.x + discRadius * cos(eTheta) * sin(ePhi); // 
+//    ePos.y = ePosInit.y + discRadius * sin(eTheta) * sin(ePhi);
+//    ePos.z = ePosInit.z + discRadius * cos(ePhi);
+    ePos = ePosInit;
     if(ePos.x > width/2)
       ePos.x = -width/2;
     else if(ePos.x < -width/2)

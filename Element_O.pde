@@ -12,11 +12,13 @@ GL gl;
 
 // element properties
 Element[] elements;
-int elementCount = 500;
+int elementCount = 1000;
+int thetaD = 50;
+int phiD = elementCount/thetaD;
 float zBoundary = 500;
 
 // disc properties
-float discRadius = 100;
+float discRadius = 200;
 float elementPosVariance = 0;
 
 ColorPalette cp;
@@ -41,16 +43,18 @@ void setup() {
   // create elements along a disc
   elements = new Element[elementCount];
   
-  for (int i = 0; i < elements.length; i++) {
-    float xVariance = random(-elementPosVariance, elementPosVariance);
-    float yVariance = random(-elementPosVariance, elementPosVariance);
-    float theta = TWO_PI*i/elementCount;
-    float phi = PI*i/elementCount;
-    float x = discRadius * cos(theta) * sin(phi) + xVariance;
-    float y = discRadius * sin(theta) * sin(phi) + yVariance;
-    float z = discRadius * cos(phi);
+  for (int i = 0; i < thetaD; i++) {
+    for(int j = 0; j < phiD; j ++) {
+        float xVariance = random(-elementPosVariance, elementPosVariance);
+        float yVariance = random(-elementPosVariance, elementPosVariance);
+        float theta = TWO_PI*i/thetaD;
+        float phi = PI*j/phiD;
+        float x = discRadius * cos(theta) * sin(phi) + xVariance;
+        float y = discRadius * sin(theta) * sin(phi) + yVariance;
+        float z = discRadius * cos(phi);
     
-    elements[i] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+      elements[i*phiD+j] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+    }
   }
   
   background(bgColor);
@@ -114,15 +118,17 @@ void drawBoundingBox() {
 }
 
 void resetElements() {
-  for (int i = 0; i < elements.length; i++) {
-    float xVariance = random(-elementPosVariance, elementPosVariance);
-    float yVariance = random(-elementPosVariance, elementPosVariance);
-    float theta = TWO_PI*i/elementCount;
-    float phi = PI*i/elementCount;
-    float x = discRadius * cos(theta) * sin(phi) + xVariance;
-    float y = discRadius * sin(theta) * sin(phi) + yVariance;
-    float z = discRadius * cos(phi);
+  for (int i = 0; i < thetaD; i++) {
+    for(int j = 0; j < phiD; j ++) {
+        float xVariance = random(-elementPosVariance, elementPosVariance);
+        float yVariance = random(-elementPosVariance, elementPosVariance);
+        float theta = TWO_PI*i/thetaD;
+        float phi = PI*j/phiD;
+        float x = discRadius * cos(theta) * sin(phi) + xVariance;
+        float y = discRadius * sin(theta) * sin(phi) + yVariance;
+        float z = discRadius * cos(phi);
     
-    elements[i] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+      elements[i*phiD+j] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+    }
   }
 }
