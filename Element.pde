@@ -6,18 +6,20 @@ class Element {
   color eColor;
   
   float eTheta;
+  float ePhi;
   float eVel;
   float eXVariance;
   float eYVariance;
   int eGlowSelect;
   
-  Element(float x, float y, float z, float theta, float xVariance, float yVariance){
+  Element(float x, float y, float z, float theta, float phi, float xVariance, float yVariance){
     ePosInit = new PVector(x, y, z);
     ePos = new PVector(0, 0, 0);
     eSize = 15;
     eColor = color(cp.colors[(int)random(cp.colors.length)]);
     
     eTheta = theta;
+    ePhi = phi;
     eVel = random(PI/100.0);
     eXVariance = xVariance;
     eYVariance = yVariance;
@@ -25,10 +27,10 @@ class Element {
   }
   
   void update() {
-    ePos.x = ePosInit.x + discRadius * cos(eTheta) + eXVariance; // 
-    ePos.y = ePosInit.y + discRadius * sin(eTheta) + eYVariance;
-    ePos.z = 0;
-    
+    ePos.x = ePosInit.x + discRadius * cos(eTheta) * sin(ePhi) + eXVariance; // 
+    ePos.y = ePosInit.y + discRadius * sin(eTheta) * sin(ePhi) + eYVariance;
+    ePos.z = ePosInit.z + discRadius * cos(ePhi);
+//    ePos = ePosInit;
     if(ePos.x > width/2)
       ePos.x = -width/2;
     else if(ePos.x < -width/2)
@@ -45,6 +47,7 @@ class Element {
       ePos.z = zBoundary;
       
     eTheta += eVel;
+    ePhi += eVel;
   }
   
   void paintVetrices () {
@@ -54,16 +57,18 @@ class Element {
 //    noStroke();
 //    vertex(ePos.x, ePos.y, ePos.z);
 
+    translate(ePos.x, ePos.y, ePos.z);
   //bill boarding to face camera at all times
     float[] rot = cam.getRotations();
     rotateX(rot[0]);
     rotateY(rot[1]);
     rotateZ(rot[2]);
 
-    if(eGlowSelect == 0)
-      image(glow1, ePos.x - 4, ePos.y - 4, 8, 8);
-    else 
-      image(glow2, ePos.x - 16, ePos.y - 16, 32, 32);    
+//    if(eGlowSelect == 0)
+//    else 
+    
+    image(glow2, - 16, - 16, 32, 32);    
+    image(glow1, - 4, - 4, 8, 8);
     popMatrix();
   }
   

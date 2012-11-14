@@ -16,7 +16,7 @@ int elementCount = 500;
 float zBoundary = 500;
 
 // disc properties
-float discRadius = 50;
+float discRadius = 100;
 float elementPosVariance = 0;
 
 ColorPalette cp;
@@ -45,17 +45,18 @@ void setup() {
     float xVariance = random(-elementPosVariance, elementPosVariance);
     float yVariance = random(-elementPosVariance, elementPosVariance);
     float theta = TWO_PI*i/elementCount;
-    float x = discRadius * cos(theta) + xVariance;
-    float y = discRadius * sin(theta) + yVariance;
-    float z = 0;
+    float phi = PI*i/elementCount;
+    float x = discRadius * cos(theta) * sin(phi) + xVariance;
+    float y = discRadius * sin(theta) * sin(phi) + yVariance;
+    float z = discRadius * cos(phi);
     
-    elements[i] = new Element(x, y, z, theta, xVariance, yVariance);
+    elements[i] = new Element(x, y, z, theta, phi, xVariance, yVariance);
   }
   
   background(bgColor);
   
   glow1 = loadImage("star.png");
-  glow2 = loadImage("glow_blue.png");  
+  glow2 = loadImage("glow_red.png");  
 }
 
 void draw() {
@@ -67,7 +68,7 @@ void draw() {
   gl.glDisable(GL.GL_DEPTH_TEST);
   gl.glEnable(GL.GL_BLEND);
   gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
-  gl.glEnable(GL.GL_POINT_SMOOTH);
+//  gl.glEnable(GL.GL_POINT_SMOOTH);
 //  gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);
   
   pgl.endGL();
@@ -117,10 +118,11 @@ void resetElements() {
     float xVariance = random(-elementPosVariance, elementPosVariance);
     float yVariance = random(-elementPosVariance, elementPosVariance);
     float theta = TWO_PI*i/elementCount;
-    float x = discRadius * cos(theta) + xVariance;
-    float y = discRadius * sin(theta) + yVariance;
-    float z = 0;
+    float phi = PI*i/elementCount;
+    float x = discRadius * cos(theta) * sin(phi) + xVariance;
+    float y = discRadius * sin(theta) * sin(phi) + yVariance;
+    float z = discRadius * cos(phi);
     
-    elements[i] = new Element(x, y, z, theta, xVariance, yVariance);
+    elements[i] = new Element(x, y, z, theta, phi, xVariance, yVariance);
   }
 }
