@@ -9,6 +9,7 @@ class Element {
   float ePhi;
   float eVelTheta;
   float eVelPhi;
+  float eVelRandom;
   float eXVariance;
   float eYVariance;
   int eGlowSelect;
@@ -21,21 +22,29 @@ class Element {
     
     eTheta = theta;
     ePhi = phi;
-    eVelTheta = TWO_PI/(thetaD);//random(PI/100.0);
-    eVelPhi = PI/(32*phiD);
+    eVelTheta = TWO_PI/(4*thetaD);
+    eVelPhi = PI/(phiD);
+    eVelRandom = random(PI/100.0);
     eXVariance = xVariance;
     eYVariance = yVariance;
     eGlowSelect = (int)random(2);
   }
   
   void update() {
-    eTheta += eVelTheta;
-    ePhi += eVelPhi;
     
-    ePos.x = discRadius * cos(eTheta) * sin(ePhi) + eXVariance; // 
-    ePos.y = discRadius * sin(eTheta) * sin(ePhi) + eYVariance;
+   if(elementBehavior % 2 ==0) {
+//    eTheta += eVelTheta;
+      ePhi += eVelPhi;
+   }
+   else {
+      eTheta += eVelRandom;
+      ePhi += eVelRandom;
+   }
+ //    ePos = ePosInit;
+    ePos.x = discRadius * cos(eTheta) * sin(ePhi) ; // 
+    ePos.y = discRadius * sin(eTheta) * sin(ePhi) ;
     ePos.z = discRadius * cos(ePhi);
-//    ePos = ePosInit;
+
     if(ePos.x > width/2)
       ePos.x = -width/2;
     else if(ePos.x < -width/2)

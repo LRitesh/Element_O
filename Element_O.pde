@@ -17,9 +17,10 @@ int thetaD = 25;
 int phiD = elementCount/thetaD;
 float zBoundary = 500;
 
-// disc properties
+// sphere properties
 float discRadius = 100;
 float elementPosVariance = 0;
+int elementBehavior = 0;
 
 ColorPalette cp;
 color bgColor = color(0);//color(242, 31, 12);
@@ -99,6 +100,9 @@ void draw() {
 //  for (int i = 0; i < elements.length; i++) {
 //    elements[i].paintPoints();
 //  }
+
+  if(frameCount % 128 == 0)
+    elementBehavior++;
 }
 
 void keyPressed() {
