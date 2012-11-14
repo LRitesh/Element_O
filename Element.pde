@@ -7,7 +7,8 @@ class Element {
   
   float eTheta;
   float ePhi;
-  float eVel;
+  float eVelTheta;
+  float eVelPhi;
   float eXVariance;
   float eYVariance;
   int eGlowSelect;
@@ -20,17 +21,21 @@ class Element {
     
     eTheta = theta;
     ePhi = phi;
-    eVel = random(PI/100.0);
+    eVelTheta = TWO_PI/(thetaD);//random(PI/100.0);
+    eVelPhi = PI/(16*phiD);
     eXVariance = xVariance;
     eYVariance = yVariance;
     eGlowSelect = (int)random(2);
   }
   
   void update() {
-//    ePos.x = ePosInit.x + discRadius * cos(eTheta) * sin(ePhi); // 
-//    ePos.y = ePosInit.y + discRadius * sin(eTheta) * sin(ePhi);
-//    ePos.z = ePosInit.z + discRadius * cos(ePhi);
-    ePos = ePosInit;
+    eTheta += eVelTheta;
+//    ePhi += eVelPhi;
+    
+    ePos.x = discRadius * cos(eTheta) * sin(ePhi); // 
+    ePos.y = discRadius * sin(eTheta) * sin(ePhi);
+    ePos.z = discRadius * cos(ePhi);
+//    ePos = ePosInit;
     if(ePos.x > width/2)
       ePos.x = -width/2;
     else if(ePos.x < -width/2)
@@ -46,14 +51,13 @@ class Element {
     else if(ePos.z < -zBoundary)
       ePos.z = zBoundary;
       
-    eTheta += eVel;
-    ePhi += eVel;
+
   }
   
   void paintVetrices () {
     pushMatrix();
-    stroke(eColor);
-    strokeWeight(eSize);
+//    fill(eColor);
+//    strokeWeight(eSize);
 //    noStroke();
 //    vertex(ePos.x, ePos.y, ePos.z);
 
@@ -67,7 +71,7 @@ class Element {
 //    if(eGlowSelect == 0)
 //    else 
     
-    image(glow2, - 16, - 16, 32, 32);    
+//    image(glow2, - 16, - 16, 32, 32);    
     image(glow1, - 4, - 4, 8, 8);
     popMatrix();
   }

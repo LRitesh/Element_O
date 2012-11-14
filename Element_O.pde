@@ -12,13 +12,13 @@ GL gl;
 
 // element properties
 Element[] elements;
-int elementCount = 1000;
+int elementCount = 2500;
 int thetaD = 50;
 int phiD = elementCount/thetaD;
 float zBoundary = 500;
 
 // disc properties
-float discRadius = 200;
+float discRadius = 100;
 float elementPosVariance = 0;
 
 ColorPalette cp;
