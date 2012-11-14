@@ -22,7 +22,7 @@ class Element {
     eTheta = theta;
     ePhi = phi;
     eVelTheta = TWO_PI/(thetaD);//random(PI/100.0);
-    eVelPhi = PI/(16*phiD);
+    eVelPhi = PI/(32*phiD);
     eXVariance = xVariance;
     eYVariance = yVariance;
     eGlowSelect = (int)random(2);
@@ -30,10 +30,10 @@ class Element {
   
   void update() {
     eTheta += eVelTheta;
-//    ePhi += eVelPhi;
+    ePhi += eVelPhi;
     
-    ePos.x = discRadius * cos(eTheta) * sin(ePhi); // 
-    ePos.y = discRadius * sin(eTheta) * sin(ePhi);
+    ePos.x = discRadius * cos(eTheta) * sin(ePhi) + eXVariance; // 
+    ePos.y = discRadius * sin(eTheta) * sin(ePhi) + eYVariance;
     ePos.z = discRadius * cos(ePhi);
 //    ePos = ePosInit;
     if(ePos.x > width/2)
@@ -56,8 +56,8 @@ class Element {
   
   void paintVetrices () {
     pushMatrix();
-//    fill(eColor);
-//    strokeWeight(eSize);
+    stroke(eColor);
+    strokeWeight(30);
 //    noStroke();
 //    vertex(ePos.x, ePos.y, ePos.z);
 
@@ -68,11 +68,17 @@ class Element {
     rotateY(rot[1]);
     rotateZ(rot[2]);
 
-//    if(eGlowSelect == 0)
-//    else 
+    if(eGlowSelect == 0) {
+      image(glow2a, - 8, - 8, 16, 16);    
+      image(glow1a, - 4, - 4, 8, 8);
+    }
+    else {
+      image(glow2b, - 8, - 8, 16, 16);    
+      image(glow1b, - 4, - 4, 8, 8);
+    }
+
     
-//    image(glow2, - 16, - 16, 32, 32);    
-    image(glow1, - 4, - 4, 8, 8);
+    
     popMatrix();
   }
   

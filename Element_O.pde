@@ -12,8 +12,8 @@ GL gl;
 
 // element properties
 Element[] elements;
-int elementCount = 2500;
-int thetaD = 50;
+int elementCount = 625;
+int thetaD = 25;
 int phiD = elementCount/thetaD;
 float zBoundary = 500;
 
@@ -24,8 +24,11 @@ float elementPosVariance = 0;
 ColorPalette cp;
 color bgColor = color(0);//color(242, 31, 12);
 
-PImage glow1;
-PImage glow2;
+PImage glow1a;
+PImage glow2a;
+
+PImage glow1b;
+PImage glow2b;
 
 void setup() {  
   size(screen.width, screen.height, OPENGL);
@@ -59,8 +62,11 @@ void setup() {
   
   background(bgColor);
   
-  glow1 = loadImage("star.png");
-  glow2 = loadImage("glow_red.png");  
+  glow1a = loadImage("star.png");
+  glow2a = loadImage("glow_red.png"); 
+ 
+  glow1b = loadImage("star.png");
+  glow2b = loadImage("glow_blue.png");  
 }
 
 void draw() {
@@ -74,7 +80,7 @@ void draw() {
   gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
 //  gl.glEnable(GL.GL_POINT_SMOOTH);
 //  gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);
-  
+
   pgl.endGL();
   
   // start drawing
