@@ -31,14 +31,16 @@ class Element {
   }
   
   void update() {
+    eVelTheta = TWO_PI/(4*thetaD);
+    eVelPhi = PI/(phiD);    
     
    if(elementBehavior % 2 ==0) {
-//    eTheta += eVelTheta;
-      ePhi += eVelPhi;
+    eTheta += eVelTheta;
+    ePhi += eVelPhi;
    }
    else {
       eTheta += eVelRandom;
-      ePhi += eVelRandom;
+//      ePhi += eVelRandom;
    }
  //    ePos = ePosInit;
     ePos.x = discRadius * cos(eTheta) * sin(ePhi) ; // 
@@ -77,24 +79,16 @@ class Element {
     rotateY(rot[1]);
     rotateZ(rot[2]);
 
-    if(eGlowSelect == 0) {
-      image(glow2a, - 8, - 8, 16, 16);    
-      image(glow1a, - 4, - 4, 8, 8);
-    }
-    else {
-      image(glow2b, - 8, - 8, 16, 16);    
+//    if(eGlowSelect == 0) {
+      image(glow2b, - 8, -8, 16, 16);    
       image(glow1b, - 4, - 4, 8, 8);
-    }
+//    }
+//    else {
+//      image(glow2b, - 8, - 8, 16, 16);    
+//      image(glow1b, - 4, - 4, 8, 8);
+//    }
 
-    
-    
     popMatrix();
-  }
-  
-  void paintPoints () {
-    stroke(255, 0, 0, 128);
-    strokeWeight(5);
-    point(ePos.x, ePos.y, ePos.z);
   }
   
   void reset() {
