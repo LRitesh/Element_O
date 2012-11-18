@@ -24,18 +24,20 @@ class Element {
     ePhi = phi;
     eVelTheta = TWO_PI/(4*thetaD);
     eVelPhi = PI/(phiD);
-    eVelRandom = random(PI/100.0);
+    eVelRandom = random(-0.01,0.01);
     eXVariance = xVariance;
     eYVariance = yVariance;
     eGlowSelect = (int)random(2);
   }
   
   void update() {
+    eSize = 32 * sin(frameCount * PI/frameRate);
+    
     eVelTheta = TWO_PI/(4*thetaD);
     eVelPhi = PI/(phiD);    
     
    if(elementBehavior % 2 ==0) {
-    eTheta += eVelTheta;
+    eTheta += eVelRandom;
     ePhi += eVelPhi;
    }
    else {
@@ -78,9 +80,9 @@ class Element {
     rotateX(rot[0]);
     rotateY(rot[1]);
     rotateZ(rot[2]);
-
+  
 //    if(eGlowSelect == 0) {
-      image(glow2b, - 8, -8, 16, 16);    
+      image(glow2b, - eSize/2, - eSize/2, eSize, eSize);    
       image(glow1b, - 4, - 4, 8, 8);
 //    }
 //    else {

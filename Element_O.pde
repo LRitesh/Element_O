@@ -14,6 +14,7 @@ GL gl;
 
 // element properties
 Element[] elements;
+boolean drawElements = true;
 int thetaD = 20;
 int elementCount = (int)pow(thetaD, 2);
 int phiD = thetaD;
@@ -21,6 +22,7 @@ float zBoundary = 1000;
 
 // floaters
 Floater[] floaters;
+boolean drawFloaters = false;
 int minFloaters = 500;
 int maxFloaters = 500;
 
@@ -120,16 +122,19 @@ void draw() {
   //  noStroke();
   
   // draw floaters
-  for (int i = 0; i < floaters.length; i++) {
-    floaters[i].update();
-    floaters[i].paintVetrices();
+  if(drawFloaters) {
+    for (int i = 0; i < floaters.length; i++) {
+      floaters[i].update();
+      floaters[i].paintVetrices();
+    }
   }
-  
   // draw elements
 //  beginShape(POINTS);
-  for (int i = 0; i < elements.length; i++) {
-    elements[i].update();
-    elements[i].paintVetrices();
+  if(drawElements) {
+    for (int i = 0; i < elements.length; i++) {
+      elements[i].update();
+      elements[i].paintVetrices();
+    }
   }
 //  endShape();
 
