@@ -14,11 +14,13 @@ GL gl;
 
 // element properties
 Element[] elements;
-boolean drawElements = true;
-int thetaD = 20;
+boolean drawElementStars = true;
+boolean drawElementLines = false;
+float elementLineAlpha = 0;
+int thetaD = 25;
 int elementCount = (int)pow(thetaD, 2);
 int phiD = thetaD;
-float zBoundary = 1000;
+float zBoundary = 1100;
 
 // floaters
 Floater[] floaters;
@@ -28,27 +30,36 @@ int maxFloaters = 500;
 
 // sphere properties
 float discRadius = 100;
-float elementPosVariance = 0;
 int elementBehavior = 0;
 
+// Bunch of 3D Arcs
+Arc3D[] arcs;
+boolean drawArcs = false;
+int arcCount = 25;
+
 ColorPalette cp;
+int cpSelect = 0;
 color bgColor = color(0);//color(242, 31, 12);
 
-PImage glow1a;
-PImage glow2a;
-
-PImage glow1b;
-PImage glow2b;
+PImage glowBright;
+PImage glowLite;
+PImage star;
 
 void setup() {  
   size(screen.width, screen.height, OPENGL);
-
+  
   // peasy cam
   cam = new PeasyCam(this, 200);
   cam.setMinimumDistance(100);
-  cam.setMaximumDistance(zBoundary);
+  cam.setMaximumDistance(zBoundary - 200);
 
   smooth();
+  background(bgColor);
+
+  glowBright = loadImage("glow_white_bright.png");
+  glowLite = loadImage("glow_white_lite.png"); 
+  star = loadImage("white_star_lite.png");
+
   //  translate(width, height, zBoundary);
   cp = new ColorPalette();
 
@@ -56,16 +67,15 @@ void setup() {
   elements = new Element[elementCount];
 
   for (int i = 0; i < thetaD; i++) {
-    for (int j = 0; j < phiD; j ++) {
-      float xVariance = random(-elementPosVariance, elementPosVariance);
-      float yVariance = random(-elementPosVariance, elementPosVariance);
+    for (int j = 0; j < phiD; j++) {
       float theta = TWO_PI*i/thetaD;
       float phi = PI*j/phiD;
-      float x = discRadius * cos(theta) * sin(phi) + xVariance;
-      float y = discRadius * sin(theta) * sin(phi) + yVariance;
+      
+      float x = discRadius * cos(theta) * sin(phi);
+      float y = discRadius * sin(theta) * sin(phi);
       float z = discRadius * cos(phi);
 
-      elements[i*phiD+j] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+      elements[i*phiD+j] = new Element(x, y, z, theta, phi);
     }
   }
   
@@ -80,13 +90,18 @@ void setup() {
     floaters[i] = new Floater(x, y, z, 1, 5);
   }
   
-  background(bgColor);
-
-  glow1a = loadImage("star.png");
-  glow2a = loadImage("glow_red.png"); 
-
-  glow1b = loadImage("star.png");
-  glow2b = loadImage("glow_blue.png");  
+  // create arcs
+  arcs = new Arc3D[arcCount];
+  for(int i = 0; i < arcCount; i++) {
+    float angleStart = random(HALF_PI);
+    float angleWidth = random(TWO_PI);
+    float radius = 20 + random(3)*i;
+    float speed = random(PI/100, PI/50);
+    float orientation = random(TWO_PI);
+    float elevation = 10;
+    
+    arcs[i] = new Arc3D(angleStart, angleWidth, radius, speed, orientation, elevation, cp.colors[cpSelect][(int)random(cp.colors[cpSelect].length)]);
+  }
 
   // slider controls
   cp5 = new ControlP5(this);
@@ -104,7 +119,7 @@ void setup() {
   ;
   cp5.addSlider("discRadius")
     .setPosition(100, 90)
-      .setRange(50, 255)
+      .setRange(85, 255)
         .setHeight(18);
   ; 
   cp5.setAutoDraw(false);
@@ -117,10 +132,12 @@ void draw() {
   // start drawing
   background(bgColor);
 
+//  cam.rotateY(PI/200);
+
   //  drawBoundingBox();
 
   //  noStroke();
-  
+
   // draw floaters
   if(drawFloaters) {
     for (int i = 0; i < floaters.length; i++) {
@@ -129,17 +146,32 @@ void draw() {
     }
   }
   // draw elements
-//  beginShape(POINTS);
-  if(drawElements) {
+
+  if(drawElementStars) {
     for (int i = 0; i < elements.length; i++) {
       elements[i].update();
       elements[i].paintVetrices();
     }
   }
-//  endShape();
+    
+  if(drawElementLines || elementLineAlpha > 0) {
+    beginShape(LINES);
+    for (int i = 0; i < elements.length; i++) {
+      elements[i].paintLines();
+    }
+    endShape();
+  }
 
-  //  if(frameCount % 128 == 0)
-  //    elementBehavior++;
+  if(drawArcs) {
+    for(int i = 0; i < arcCount; i++){
+      arcs[i].display();
+      arcs[i].aAngleStart += arcs[i].aSpeed;
+      arcs[i].aOrientation += arcs[i].aSpeed;
+    }
+  }
+
+  if(frameCount % 128 == 0)
+    elementBehavior++;
 
   // draw gui
   gui();
@@ -159,6 +191,7 @@ void setupGL() {
 
   gl.glDisable(GL.GL_DEPTH_TEST);
   gl.glEnable(GL.GL_BLEND);
+
   gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
 
   pgl.endGL();
@@ -173,6 +206,14 @@ void keyPressed() {
   else if (key == 'c' || key == 'C') {
     background(0);
     resetElements();
+  }
+  
+  else if(key == 'l' || key == 'L' ) {
+    drawElementLines = !drawElementLines;
+  }
+  
+  else if(key == '1' || key == '2' || key == '3') {
+    cpSelect = key - '1';
   }
 }
 
@@ -194,15 +235,13 @@ void resetElements() {
   elements = new Element[elementCount];
   for (int i = 0; i < thetaD; i++) {
     for (int j = 0; j < phiD; j ++) {
-      float xVariance = random(-elementPosVariance, elementPosVariance);
-      float yVariance = random(-elementPosVariance, elementPosVariance);
       float theta = TWO_PI*i/thetaD;
       float phi = PI*j/phiD;
-      float x = discRadius * cos(theta) * sin(phi) + xVariance;
-      float y = discRadius * sin(theta) * sin(phi) + yVariance;
+      float x = discRadius * cos(theta) * sin(phi);
+      float y = discRadius * sin(theta) * sin(phi);
       float z = discRadius * cos(phi);
 
-      elements[i*phiD+j] = new Element(x, y, z, theta, phi, xVariance, yVariance);
+      elements[i*phiD+j] = new Element(x, y, z, theta, phi);
     }
   }
 }

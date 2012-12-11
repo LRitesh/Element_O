@@ -42,14 +42,7 @@ class Floater {
     rotateY(rot[1]);
     rotateZ(rot[2]);
 
-    if(eGlowSelect == 0) {
-      image(glow2b, - 16, -16, 32, 32);    
-      image(glow1b, - 4, - 4, 8, 8);
-    }
-    else {
-      image(glow2b, - 16, - 16, 32, 32);    
-//      image(glow1b, - 4, - 4, 8, 8);
-    }
+    image(glowLite, - 16, -16, 32, 32);    
 
     popMatrix();
   }
