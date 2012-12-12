@@ -3,7 +3,7 @@ class Element {
   PVector ePosInit;
   PVector ePos;
   float eSize;
-  float eMaxSize;
+  float eNextSize;
   color eColor;
   float eOscillator = 0;
   
@@ -20,9 +20,8 @@ class Element {
   Element(float x, float y, float z, float theta, float phi){
     ePosInit = new PVector(x, y, z);
     ePos = new PVector(0, 0, 0);
-    eMaxSize = 32;
     eColor = color(cp.colors[cpSelect][(int)random(cp.colors[cpSelect].length)]);
-    eRadius = discRadius;
+    eRadius = sphereR;
     
     eTheta = theta;
     ePhi = phi;
@@ -34,26 +33,48 @@ class Element {
   
   void update() {
     eOscillator += PI/200;
-    eSize = eMaxSize * abs(sin(eOscillator));
+    
+    if(pulsate)
+      eNextSize = glowS * abs(sin(eOscillator));
+    else
+      eNextSize = glowS;
+      
+    if((int)eNextSize > (int)eSize) {
+      eSize++;
+    }
+    else if((int)eNextSize < (int)eSize){
+      eSize--;
+    }
     
     eVelTheta = TWO_PI/(4*thetaD);
     eVelPhi = PI/(phiD);    
     
-//   if(elementBehavior % 2 ==0) {
-    eTheta += eVelTheta;
-//    ePhi += eVelPhi;
-//   }
-//   else
-//   {
-//     eTheta += eVelRandom;
-//     ePhi += eVelRandom;
-//   }
+    switch(elementBehavior) {
+     case 0: {
+       eTheta += eVelTheta;
+       break;
+     }
+     case 1: {
+       eTheta += eVelTheta;
+       ePhi += eVelPhi;
+       break;
+     }
+     case 2: {
+       eTheta += (eVelRandom * velS);
+       ePhi += eVelPhi;
+       break;
+     }
+     case 3: {
+       eTheta += (eVelRandom * velS);
+       ePhi += (eVelRandom * velS);
+       break;
+     }
+    }
 
- //    ePos = ePosInit;
-    if(discRadius > eRadius + 5)
-      eRadius += 3;
-    else if(discRadius < eRadius - 5)
-      eRadius -= 3;
+    if(sphereR > eRadius + 5)
+      eRadius ++;
+    else if(sphereR < eRadius - 5)
+      eRadius --;
  
     ePos.x = eRadius * cos(eTheta) * sin(ePhi) ; // 
     ePos.y = eRadius * sin(eTheta) * sin(ePhi) ;

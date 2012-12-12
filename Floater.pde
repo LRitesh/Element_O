@@ -2,12 +2,13 @@ class Floater {
   
   PVector ePos;
   PVector eVel;
+  color eColor;
   int eGlowSelect;
   
   Floater(float x, float y, float z, int minVel, int maxVel){
     ePos = new PVector(x, y, z);
     eVel = new PVector(random(minVel, maxVel), random(minVel, maxVel), random(minVel, maxVel));
-    eGlowSelect = 1;
+    eColor = color(cp.colors[cpSelect][(int)random(cp.colors[cpSelect].length)]);
   }
   
   void update() {
@@ -42,6 +43,7 @@ class Floater {
     rotateY(rot[1]);
     rotateZ(rot[2]);
 
+    tint(eColor);
     image(glowLite, - 16, -16, 32, 32);    
 
     popMatrix();

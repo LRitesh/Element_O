@@ -6,11 +6,17 @@ class ColorPalette {
   
   ColorPalette() {
     colors_dark = new color[]{
-      color(69, 41, 52),
-      color(43, 17, 28),
-      color(43, 42, 38),
-      color(30, 18, 22),
-      color(66, 33, 46)
+        color(89, 17, 23),
+        color(11, 15, 38),
+        color(15, 27, 64),
+        color(23, 54, 115),
+        color(166, 15, 15)
+
+//      color(69, 41, 52),
+//      color(43, 17, 28),
+//      color(43, 42, 38),
+//      color(30, 18, 22),
+//      color(66, 33, 46)
     };
     
     colors_mid = new color[]{

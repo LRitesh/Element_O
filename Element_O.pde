@@ -6,6 +6,10 @@ import javax.media.opengl.*;
 import controlP5.*;
 ControlP5 cp5;
 
+import oscP5.*;
+import netP5.*;
+OscP5 oscP5;
+
 import peasy.*;
 PeasyCam cam;
 
@@ -20,6 +24,7 @@ float elementLineAlpha = 0;
 int thetaD = 25;
 int elementCount = (int)pow(thetaD, 2);
 int phiD = thetaD;
+float velS = 1.0;
 float zBoundary = 1100;
 
 // floaters
@@ -29,12 +34,14 @@ int minFloaters = 500;
 int maxFloaters = 500;
 
 // sphere properties
-float discRadius = 100;
+float sphereR = 10;
+int glowS = 2;
 int elementBehavior = 0;
+boolean pulsate = true;
 
 // Bunch of 3D Arcs
 Arc3D[] arcs;
-boolean drawArcs = false;
+boolean drawArcs = true;
 int arcCount = 25;
 
 ColorPalette cp;
@@ -45,11 +52,15 @@ PImage glowBright;
 PImage glowLite;
 PImage star;
 
+// other props
+boolean rotateCam = false;
+boolean showCursor = true;
+
 void setup() {  
   size(screen.width, screen.height, OPENGL);
   
   // peasy cam
-  cam = new PeasyCam(this, 200);
+  cam = new PeasyCam(this, 600);
   cam.setMinimumDistance(100);
   cam.setMaximumDistance(zBoundary - 200);
 
@@ -71,9 +82,9 @@ void setup() {
       float theta = TWO_PI*i/thetaD;
       float phi = PI*j/phiD;
       
-      float x = discRadius * cos(theta) * sin(phi);
-      float y = discRadius * sin(theta) * sin(phi);
-      float z = discRadius * cos(phi);
+      float x = sphereR * cos(theta) * sin(phi);
+      float y = sphereR * sin(theta) * sin(phi);
+      float z = sphereR * cos(phi);
 
       elements[i*phiD+j] = new Element(x, y, z, theta, phi);
     }
@@ -119,10 +130,13 @@ void setup() {
   ;
   cp5.addSlider("discRadius")
     .setPosition(100, 90)
-      .setRange(85, 255)
+      .setRange(10, 255)
         .setHeight(18);
   ; 
   cp5.setAutoDraw(false);
+  
+  /* start oscP5, listening for incoming messages at port 8000 */
+  oscP5 = new OscP5(this,8000);
 }
 
 void draw() {
@@ -132,11 +146,10 @@ void draw() {
   // start drawing
   background(bgColor);
 
-//  cam.rotateY(PI/200);
-
-  //  drawBoundingBox();
-
-  //  noStroke();
+  if(rotateCam) {
+    cam.rotateX(PI/200);
+    cam.rotateY(PI/200);
+  }
 
   // draw floaters
   if(drawFloaters) {
@@ -170,9 +183,6 @@ void draw() {
     }
   }
 
-  if(frameCount % 128 == 0)
-    elementBehavior++;
-
   // draw gui
   gui();
 }
@@ -197,23 +207,90 @@ void setupGL() {
   pgl.endGL();
 }
 
+// handle osc events
+void oscEvent(OscMessage theOscMessage) {
+
+    String addr = theOscMessage.addrPattern();
+    float  val  = theOscMessage.get(0).floatValue();
+
+    if(addr.equals("/1/theta"))        { thetaD = (int)val; }
+    else if(addr.equals("/1/phiD"))   { phiD = (int)val; }
+    else if(addr.equals("/1/velS"))   { velS = val; }
+    else if(addr.equals("/1/glowS"))   { mapGlowSValue((int)val); }
+    else if(addr.equals("/1/sphereR"))   { sphereR = val; }
+    else if(addr.equals("/1/behavior/2/1"))  { if(val == 1.0) elementBehavior = 0; }
+    else if(addr.equals("/1/behavior/2/2"))  { if(val == 1.0) elementBehavior = 1; }
+    else if(addr.equals("/1/behavior/1/1"))  { if(val == 1.0) elementBehavior = 2; }
+    else if(addr.equals("/1/behavior/1/2"))  { if(val == 1.0) elementBehavior = 3; }
+    else if(addr.equals("/1/lines"))  { if(val == 1.0) drawElementLines = true; else drawElementLines = false;}
+    else if(addr.equals("/1/pulse"))  { if(val == 1.0) pulsate = true; else pulsate = false;}
+}
+
+void mapGlowSValue(int val) {
+  if(val > 0) {
+    int powVal = (int)(log(val) / log(2));
+    glowS = (int)pow(2, powVal);
+  }
+  else glowS = 0;
+}
+
 void keyPressed() {
-  println("reset required");
+  
+  // reset points o/n the sphere
   if (key == 'r' || key == 'R' ) {
     resetElements();
   }
-
-  else if (key == 'c' || key == 'C') {
-    background(0);
-    resetElements();
-  }
   
+  // show/hide lines between points
   else if(key == 'l' || key == 'L' ) {
     drawElementLines = !drawElementLines;
   }
   
+  else if(key == 'a' || key == 'A') {
+    drawArcs = !drawArcs;
+    
+    if(!drawArcs) {
+      glowS = 32;
+      sphereR = 100;
+    }
+    else {
+      sphereR = 10;
+      glowS = 2;
+    }
+  }
+  
+  else if(key == 'c' || key == 'C') {
+    rotateCam = !rotateCam;
+  }
+  
+  // select color palette
   else if(key == '1' || key == '2' || key == '3') {
     cpSelect = key - '1';
+  }
+  
+  else if(key == '+' || key == '=') {
+    elementBehavior++;
+    
+    if(elementBehavior > 3)
+      elementBehavior = 3;
+  }
+  
+  else if(key == '-' || key == '_') {
+    elementBehavior--;
+    
+    if(elementBehavior < 0)
+      elementBehavior = 0;
+  }
+  
+  else if(key == 'v' || key == 'V'){
+    showCursor = !showCursor;
+    
+    if(showCursor) {
+      cursor();
+    }
+    else {
+      noCursor();
+    }
   }
 }
 
@@ -237,12 +314,36 @@ void resetElements() {
     for (int j = 0; j < phiD; j ++) {
       float theta = TWO_PI*i/thetaD;
       float phi = PI*j/phiD;
-      float x = discRadius * cos(theta) * sin(phi);
-      float y = discRadius * sin(theta) * sin(phi);
-      float z = discRadius * cos(phi);
+      float x = sphereR * cos(theta) * sin(phi);
+      float y = sphereR * sin(theta) * sin(phi);
+      float z = sphereR * cos(phi);
 
       elements[i*phiD+j] = new Element(x, y, z, theta, phi);
     }
+  }
+    
+  // create arcs
+  arcs = new Arc3D[arcCount];
+  for(int i = 0; i < arcCount; i++) {
+    float angleStart = random(HALF_PI);
+    float angleWidth = random(TWO_PI);
+    float radius = 20 + random(3)*i;
+    float speed = random(PI/100, PI/50);
+    float orientation = random(TWO_PI);
+    float elevation = 10;
+  
+    arcs[i] = new Arc3D(angleStart, angleWidth, radius, speed, orientation, elevation, cp.colors[cpSelect][(int)random(cp.colors[cpSelect].length)]);
+  }
+    
+  // create randomly floating floaters
+  floaters = new Floater[(int) random(minFloaters, maxFloaters)]; 
+  
+  for (int i = 0; i < floaters.length; i++) {
+    float x = random(-width/2, width/2);
+    float y = random(-height/2, height/2);
+    float z = random(-zBoundary, zBoundary);
+    
+    floaters[i] = new Floater(x, y, z, 1, 5);
   }
 }
 
