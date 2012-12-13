@@ -3,9 +3,6 @@
 import processing.opengl.*;
 import javax.media.opengl.*;
 
-import controlP5.*;
-ControlP5 cp5;
-
 import oscP5.*;
 import netP5.*;
 OscP5 oscP5;
@@ -42,7 +39,7 @@ boolean pulsate = true;
 // Bunch of 3D Arcs
 Arc3D[] arcs;
 boolean drawArcs = true;
-int arcCount = 25;
+int arcCount = 35;
 
 ColorPalette cp;
 int cpSelect = 0;
@@ -113,27 +110,6 @@ void setup() {
     
     arcs[i] = new Arc3D(angleStart, angleWidth, radius, speed, orientation, elevation, cp.colors[cpSelect][(int)random(cp.colors[cpSelect].length)]);
   }
-
-  // slider controls
-  cp5 = new ControlP5(this);
-  cp5.addSlider("thetaD")
-    .setPosition(100, 50)
-      .setRange(1, 255)
-        .setValue(180)
-          .setHeight(18);
-  ;
-  cp5.addSlider("phiD")
-    .setPosition(100, 70)
-      .setRange(1, 255)
-        .setValue(180)
-          .setHeight(18);
-  ;
-  cp5.addSlider("discRadius")
-    .setPosition(100, 90)
-      .setRange(10, 255)
-        .setHeight(18);
-  ; 
-  cp5.setAutoDraw(false);
   
   /* start oscP5, listening for incoming messages at port 8000 */
   oscP5 = new OscP5(this,8000);
@@ -182,16 +158,6 @@ void draw() {
       arcs[i].aOrientation += arcs[i].aSpeed;
     }
   }
-
-  // draw gui
-  gui();
-}
-
-// draw control p5 gui here
-void gui() {
-  cam.beginHUD();
-  cp5.draw();
-  cam.endHUD();
 }
 
 // setup OpenGL state machine
@@ -213,7 +179,7 @@ void oscEvent(OscMessage theOscMessage) {
     String addr = theOscMessage.addrPattern();
     float  val  = theOscMessage.get(0).floatValue();
 
-    if(addr.equals("/1/theta"))        { thetaD = (int)val; }
+    if(addr.equals("/1/thetaD"))        { thetaD = (int)val; }
     else if(addr.equals("/1/phiD"))   { phiD = (int)val; }
     else if(addr.equals("/1/velS"))   { velS = val; }
     else if(addr.equals("/1/glowS"))   { mapGlowSValue((int)val); }
@@ -291,6 +257,10 @@ void keyPressed() {
     else {
       noCursor();
     }
+  }
+  
+  else if(key == 'f' || key == 'F'){
+    drawFloaters = !drawFloaters;
   }
 }
 
